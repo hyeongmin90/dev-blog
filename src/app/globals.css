@@ -191,9 +191,8 @@ a {
   border-color: var(--graphite);
 }
 
-.kbd-btn kbd {
-  font-family: var(--font-code);
-  font-size: 11.5px;
+.kbd-btn svg {
+  flex: none;
 }
 
 /* 좁은 화면(대개 키보드 없는 휴대폰)에서는 ⌘K 버튼을 빼고 이름과 메뉴 사이 간격을 지킨다 */

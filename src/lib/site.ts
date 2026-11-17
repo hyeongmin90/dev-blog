@@ -12,7 +12,8 @@ export const site = {
   github: "https://github.com/hyeongmin90",
   repo: "https://github.com/hyeongmin90/dev-blog",
   portfolio: {
-    title: "박형민 포트폴리오",
+    /** 브라우저 탭 제목 */
+    title: "Portfolio",
     description: "왜?를 먼저 묻고 답을 만드는 백엔드 엔지니어 박형민의 포트폴리오입니다.",
     // 히어로 헤드라인(영문). 한 줄씩 나눠 둬야 줄마다 등장 연출이 걸린다.
     headline: ["Ask why.", "Build the answer."],

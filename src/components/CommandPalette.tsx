@@ -1,9 +1,11 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 export type PaletteItem = { title: string; kind: string; href: string };
+
+const subscribeNoop = () => () => {};
 
 function matches(item: PaletteItem, q: string): boolean {
   const hay = `${item.title} ${item.kind}`.toLowerCase();
@@ -23,6 +25,12 @@ export function CommandPalette({ items }: { items: PaletteItem[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const listId = useId();
+  // 툴팁의 단축키 표기: Mac은 ⌘K, 그 외는 Ctrl+K. 서버 렌더에서는 OS를 모르므로 Ctrl+K로 시작한다.
+  const shortcut = useSyncExternalStore(
+    subscribeNoop,
+    () => (/Mac|iPhone|iPad/.test(navigator.platform) ? "⌘K" : "Ctrl+K"),
+    () => "Ctrl+K",
+  );
 
   const shown = useMemo(() => items.filter((it) => matches(it, query.trim())), [items, query]);
 
@@ -72,8 +80,18 @@ export function CommandPalette({ items }: { items: PaletteItem[] }) {
 
   return (
     <>
-      <button type="button" className="kbd-btn" onClick={open} aria-label="빠른 이동 열기" aria-keyshortcuts="Meta+K Control+K">
-        <kbd>⌘K</kbd>
+      <button
+        type="button"
+        className="kbd-btn"
+        onClick={open}
+        aria-label="빠른 이동 열기"
+        aria-keyshortcuts="Meta+K Control+K"
+        title={`빠른 이동 (${shortcut})`}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
         <span>빠른 이동</span>
       </button>
       <dialog ref={dialog} className="palette" aria-label="빠른 이동" onClick={(e) => e.target === dialog.current && close()}>
