@@ -30,8 +30,8 @@ export async function SiteHeader({ world }: { world: World }) {
   return (
     <header className="site-header" data-world={world}>
       <div className="site-header-inner">
-        <Link href="/" className="site-name">
-          {site.name}
+        <Link href="/" className="site-name" lang="en">
+          {site.nameEn}
         </Link>
         <nav aria-label="주 메뉴">
           <Link href="/" aria-current={world === "portfolio" ? "page" : undefined}>

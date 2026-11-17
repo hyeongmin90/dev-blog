@@ -1,5 +1,7 @@
 export const site = {
   name: "박형민",
+  /** 헤더에 쓰는 영문 이름 */
+  nameEn: "Park Hyeongmin",
   role: "Backend + AI Engineer",
   url: "https://blog.hyeongmin.dev",
   // 예전 도메인으로 된 절대 링크를 사이트 내부 링크로 바꿀 때 사용한다.
