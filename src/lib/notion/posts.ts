@@ -1,6 +1,7 @@
 import { collectPaginatedAPI, isFullPage } from "@notionhq/client";
 import type { PageObjectResponse } from "@notionhq/client";
 import { cacheLife, cacheTag } from "next/cache";
+import { parseMetrics, type Metric } from "@/lib/delta";
 import { dataSourceId, normalizeId, notion } from "./client";
 
 export type Status = "Public" | "PublicOnDetail";
@@ -17,9 +18,14 @@ export type Post = {
   status: Status;
   type: string | null;
   thumbnail: string | null;
-  /** 프로젝트 행에 보여줄 대표 수치 한 줄. DB에 `highlight` 속성이 있을 때만 채워진다. */
-  highlight: string | null;
   updatedAt: string;
+  // ↓ 포트폴리오 프로젝트에서만 쓰는 속성. 블로그 글에서는 비어 있다.
+  period: string | null;
+  team: string | null;
+  metrics: Metric[];
+  stack: string[];
+  /** 값이 있으면 포트폴리오 홈에 이 순서로 나온다. */
+  order: number | null;
 };
 
 type Property = PageObjectResponse["properties"][string];
@@ -37,6 +43,10 @@ function select(prop: Property | undefined): string | null {
 
 function multiSelect(prop: Property | undefined): string[] {
   return prop?.type === "multi_select" ? prop.multi_select.map((o) => o.name) : [];
+}
+
+function num(prop: Property | undefined): number | null {
+  return prop?.type === "number" ? prop.number : null;
 }
 
 function date(prop: Property | undefined): string | null {
@@ -68,8 +78,12 @@ function toPost(page: PageObjectResponse): Post | null {
     status,
     type: select(p.type),
     thumbnail: thumbnail(page),
-    highlight: text(p.highlight).trim() || null,
     updatedAt: page.last_edited_time,
+    period: text(p.period).trim() || null,
+    team: text(p.team).trim() || null,
+    metrics: parseMetrics(text(p.metrics)),
+    stack: multiSelect(p.stack),
+    order: num(p.order),
   };
 }
 
@@ -112,6 +126,19 @@ export function isBlogPost(post: Post): boolean {
 
 export function isProject(post: Post): boolean {
   return worldOf(post) === "portfolio" && post.slug.startsWith("portfolio-");
+}
+
+/** 포트폴리오 홈에 나올 프로젝트: order가 있는 프로젝트 글, order 오름차순. */
+export function projectsForHome(posts: Post[]): Post[] {
+  return posts
+    .filter((p) => isProject(p) && p.order !== null)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+/** "Vantage | AI 지식 큐레이션 플랫폼" → 이름과 한 줄 설명 */
+export function splitProjectTitle(title: string): { name: string; tagline: string } {
+  const [name, ...rest] = title.split(/\s*\|\s*/);
+  return { name: name.trim(), tagline: rest.join(" | ").trim() };
 }
 
 /** 노션 페이지 ID → slug. 본문 속 페이지 링크와 멘션을 사이트 경로로 바꿀 때 쓴다. */

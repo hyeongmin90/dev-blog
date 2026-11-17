@@ -2,11 +2,8 @@ import type { RichTextItemResponse } from "@notionhq/client";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Math as TeX } from "./Math";
+import { DELTA } from "@/lib/delta";
 import { isExternal, pageHref, resolveHref, type RenderCtx } from "./context";
-
-// "0.811 → 0.944", "8/14 -> 13/14", "0.9 에서 0.98로" 같은 개선 수치.
-const DELTA =
-  /(\d+(?:\.\d+)?(?:\/\d+)?%?)(\s*(?:→|->|에서)\s*)(\d+(?:\.\d+)?(?:\/\d+)?%?)(로|으로)?/g;
 
 function withDeltas(text: string, key: string): ReactNode {
   const out: ReactNode[] = [];

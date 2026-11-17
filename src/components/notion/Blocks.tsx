@@ -7,7 +7,6 @@ import { Code } from "./Code";
 import { Math as TeX } from "./Math";
 import { dropChars, RichText } from "./RichText";
 import { isExternal, pageHref, resolveHref, type RenderCtx } from "./context";
-import { ProjectRows } from "@/components/portfolio/ProjectRows";
 
 type Props = { blocks: NBlock[]; ctx: RenderCtx };
 
@@ -45,17 +44,6 @@ function caseLabel(b: NBlock): { label: string; length: number } | null {
   return m ? { label: m[1], length: m[0].length } : null;
 }
 
-// ---- 프로젝트 링크로만 된 목록 ----
-function projectSlug(b: NBlock, ctx: RenderCtx): string | null {
-  const rich = itemRich(b).filter((t) => t.plain_text.trim() !== "");
-  if (rich.length === 0 || b.children?.length) return null;
-  const hrefs = new Set(rich.map((t) => (t.href ? resolveHref(t.href, ctx) : null)));
-  if (hrefs.size !== 1) return null;
-  const [href] = hrefs;
-  const slug = href?.startsWith("/") ? href.slice(1) : null;
-  return slug && ctx.projects[slug] ? slug : null;
-}
-
 function List({ items, ordered, ctx }: { items: NBlock[]; ordered: boolean; ctx: RenderCtx }) {
   if (ctx.world === "portfolio" && !ordered) {
     const labels = items.map(caseLabel);
@@ -76,10 +64,6 @@ function List({ items, ordered, ctx }: { items: NBlock[]; ordered: boolean; ctx:
           })}
         </dl>
       );
-    }
-    const slugs = items.map((b) => projectSlug(b, ctx));
-    if (slugs.every(Boolean)) {
-      return <ProjectRows projects={slugs.map((s) => ctx.projects[s!])} />;
     }
   }
 

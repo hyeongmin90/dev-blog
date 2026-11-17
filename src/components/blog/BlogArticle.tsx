@@ -4,6 +4,7 @@ import type { RenderCtx } from "@/components/notion/context";
 import { collectToc, type NBlock } from "@/lib/notion/blocks";
 import type { Post } from "@/lib/notion/posts";
 import { formatDate } from "@/lib/format";
+import { Toc } from "./Toc";
 
 type Props = { post: Post; blocks: NBlock[]; ctx: RenderCtx; newer: Post | null; older: Post | null };
 
@@ -56,18 +57,7 @@ export function BlogArticle({ post, blocks, ctx, newer, older }: Props) {
         ) : null}
       </article>
 
-      {toc.length >= 3 ? (
-        <nav className="toc" aria-label="목차">
-          <p className="toc-title">목차</p>
-          <ol>
-            {toc.map((t) => (
-              <li key={t.id} className={t.level === 3 ? "toc-sub" : undefined}>
-                <a href={`#${t.id}`}>{t.text}</a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      ) : null}
+      {toc.length >= 3 ? <Toc items={toc} /> : null}
     </div>
   );
 }

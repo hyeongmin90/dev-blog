@@ -38,6 +38,21 @@ export function plainText(rich: { plain_text: string }[]): string {
   return rich.map((t) => t.plain_text).join("");
 }
 
+/**
+ * 목록 카드에 보여줄 본문 첫머리. 최상위 문단만 이어 붙인다(제목, 코드, 목록은 건너뜀).
+ */
+export function excerptOf(blocks: NBlock[], max = 220): string {
+  let text = "";
+  for (const b of blocks) {
+    if (b.type !== "paragraph") continue;
+    const t = plainText(b.paragraph.rich_text).replace(/\s+/g, " ").trim();
+    if (!t) continue;
+    text = text ? `${text} ${t}` : t;
+    if (text.length >= max) break;
+  }
+  return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text;
+}
+
 export type TocItem = { id: string; text: string; level: 2 | 3 };
 
 export function hasHeading1(blocks: NBlock[]): boolean {

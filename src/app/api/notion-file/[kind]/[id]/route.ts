@@ -1,6 +1,6 @@
 import { isFullBlock, isFullPage } from "@notionhq/client";
 import type { BlockObjectResponse, PageObjectResponse } from "@notionhq/client";
-import { NOTION_ID, notion } from "@/lib/notion/client";
+import { NOTION_ID, dataSourceId, normalizeId, notion } from "@/lib/notion/client";
 
 // Vercel 함수 응답 본문 한도(4.5MB)보다 작은 파일만 직접 전달하고, 큰 파일은 리다이렉트한다.
 const MAX_PROXY_BYTES = 4 * 1024 * 1024;
@@ -43,13 +43,18 @@ const notFound = () => new Response("파일을 찾을 수 없습니다.", { stat
 
 export async function GET(_req: Request, { params }: { params: Promise<{ kind: string; id: string }> }) {
   const { kind, id } = await params;
-  if (!NOTION_ID.test(id) || (kind !== "block" && kind !== "page")) return notFound();
+  if (!NOTION_ID.test(id) || !["block", "page", "database"].includes(kind)) return notFound();
 
   let url: string | null = null;
   try {
     if (kind === "block") {
       const block = await notion().blocks.retrieve({ block_id: id });
       if (isFullBlock(block)) url = blockFileUrl(block);
+    } else if (kind === "database") {
+      // 블로그 DB(Developer Log)의 커버만 내보낸다.
+      const db = await notion().databases.retrieve({ database_id: id });
+      const ours = "data_sources" in db && db.data_sources.some((s) => normalizeId(s.id) === normalizeId(dataSourceId()));
+      if (ours && "cover" in db) url = urlOf(db.cover as FileValue | undefined);
     } else {
       const page = await notion().pages.retrieve({ page_id: id });
       if (isFullPage(page)) url = thumbnailUrl(page);
@@ -59,7 +64,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ kind: s
   }
   if (!url) return notFound();
 
-  const upstream = await fetch(url);
+  // Next의 fetch 캐시는 본문을 복제(tee)하는데, 그러면 큰 파일에서 본문 취소가 끝나지 않는다.
+  // 파일 캐시는 CDN 헤더로 처리하므로 Next 캐시는 쓰지 않는다.
+  const upstream = await fetch(url, { cache: "no-store" });
   const size = Number(upstream.headers.get("content-length") ?? "0");
   if (!upstream.ok || !upstream.body) {
     return new Response("원본 파일을 가져오지 못했습니다.", { status: 502 });
@@ -67,7 +74,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ kind: s
 
   if (size > MAX_PROXY_BYTES || size === 0) {
     // 서명 URL은 1시간 뒤 만료되므로 리다이렉트는 30분만 캐시한다.
-    await upstream.body.cancel();
+    // 본문은 필요 없으니 연결만 끊는다. 취소가 끝나길 기다리지 않는다.
+    upstream.body.cancel().catch(() => {});
     return new Response(null, {
       status: 307,
       headers: { location: url, "cache-control": "public, max-age=0, s-maxage=1800" },

@@ -7,6 +7,10 @@ import { getBlocks } from "@/lib/notion/blocks";
 import { getAllPosts, isBlogPost, worldOf } from "@/lib/notion/posts";
 import { makeCtx } from "@/lib/render-ctx";
 
+// 미리 생성하지 않은 slug도 완성된 결과를 기다렸다가 응답한다.
+// 앱 셸을 먼저 보내면 없는 글이 404 대신 200(소프트 404)으로 나가기 때문이다.
+export const ensureStatic = "navigation";
+
 export async function generateStaticParams() {
   const posts = await getAllPosts();
   return posts.filter((p) => p.slug !== "portfolio").map((p) => ({ slug: p.slug }));

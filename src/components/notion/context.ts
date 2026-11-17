@@ -1,4 +1,4 @@
-import type { Post, World } from "@/lib/notion/posts";
+import type { World } from "@/lib/notion/posts";
 import { normalizeId } from "@/lib/notion/client";
 import { site } from "@/lib/site";
 
@@ -7,8 +7,6 @@ export type RenderCtx = {
   world: World;
   /** 노션 페이지 ID(하이픈 없음) → slug */
   slugs: Record<string, string>;
-  /** slug → 프로젝트 글. 프로젝트 링크 목록을 프로젝트 행으로 바꿀 때 쓴다. */
-  projects: Record<string, Post>;
   /** 페이지에 heading_1이 있으면 제목 단계를 하나씩 내린다(h1은 페이지 제목 전용). */
   shiftHeadings: boolean;
 };
