@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useDeferredValue, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { COVER_VIEWBOX, categoryColor, categoryLabel, coverBars } from "@/lib/cover";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { COVER_VIEWBOX, categoryColor, categoryLabel, coverBars, sizedImage } from "@/lib/cover";
 import { formatDate } from "@/lib/format";
 
 export type ListItem = {
@@ -28,6 +28,37 @@ function matches(item: ListItem, q: string): boolean {
     .split(/\s+/)
     .filter(Boolean)
     .every((word) => hay.includes(word));
+}
+
+/**
+ * 썸네일. 자동 커버를 먼저 깔아 두고, 줄인 이미지가 도착하면 그 위로 서서히 띄운다.
+ * 그래서 이미지가 늦게 와도 카드는 처음부터 완성된 모습으로 보인다.
+ */
+function Thumbnail({ src, slug }: { src: string; slug: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+  // 하이드레이션 전에 이미 로드가 끝났으면 onLoad가 오지 않으므로 직접 확인한다.
+  useEffect(() => {
+    if (ref.current?.complete && ref.current.naturalWidth > 0) setLoaded(true);
+  }, []);
+  const sized = src.startsWith("/api/notion-file/");
+  return (
+    <>
+      <AutoCover slug={slug} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        ref={ref}
+        src={sizedImage(src, 400)}
+        srcSet={sized ? `${sizedImage(src, 400)} 400w, ${sizedImage(src, 800)} 800w` : undefined}
+        sizes="300px"
+        alt=""
+        loading="lazy"
+        decoding="async"
+        data-loaded={loaded}
+        onLoad={() => setLoaded(true)}
+      />
+    </>
+  );
 }
 
 function AutoCover({ slug }: { slug: string }) {
@@ -116,12 +147,7 @@ export function BlogList({ items, categories, mast }: { items: ListItem[]; categ
             <li key={it.slug} className="post-card" style={{ "--c": categoryColor(it.category) } as CSSProperties}>
               {/* 카드 전체를 누를 수 있게 제목 링크를 카드 위로 늘린다(태그 버튼은 그 위에 따로 놓임). */}
               <div className="post-cover">
-                {it.thumbnail ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={it.thumbnail} alt="" loading="lazy" />
-                ) : (
-                  <AutoCover slug={it.slug} />
-                )}
+                {it.thumbnail ? <Thumbnail src={it.thumbnail} slug={it.slug} /> : <AutoCover slug={it.slug} />}
               </div>
               <div className="post-body">
                 <div className="post-meta">

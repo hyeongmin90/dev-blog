@@ -196,9 +196,17 @@ a {
   font-size: 11.5px;
 }
 
+/* 좁은 화면(대개 키보드 없는 휴대폰)에서는 ⌘K 버튼을 빼고 이름과 메뉴 사이 간격을 지킨다 */
 @media (max-width: 640px) {
-  .kbd-btn span {
+  .kbd-btn {
     display: none;
+  }
+  .site-header nav {
+    gap: 16px;
+  }
+  .site-name {
+    margin-right: 16px;
+    white-space: nowrap;
   }
 }
 
@@ -234,11 +242,11 @@ a {
 }
 
 .hero-title {
-  font-size: 44px;
-  line-height: 1.28;
-  letter-spacing: -0.02em;
+  font-size: 56px;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
   font-weight: 700;
-  margin: 14px 0 18px;
+  margin: 16px 0 22px;
 }
 
 /* 페이지에 들어올 때 한 번만 일어나는 연출: 헤드라인 줄이 차례로 떠오른다 */
@@ -410,10 +418,20 @@ a {
   fill: color-mix(in srgb, var(--accent) 7%, var(--paper));
 }
 
-.sys-panel {
+/* 설명 패널들을 한 칸에 겹친다: 높이 = 가장 긴 설명 */
+.sys-panels {
+  display: grid;
   border-top: 1px solid var(--rule);
+}
+
+.sys-panel {
+  grid-area: 1 / 1;
   padding: 14px 16px 16px;
-  min-height: 132px;
+  visibility: hidden;
+}
+
+.sys-panel[data-on="true"] {
+  visibility: visible;
 }
 
 .sys-panel h3 {
@@ -729,7 +747,7 @@ a {
     padding: 48px 20px 40px;
   }
   .hero-title {
-    font-size: 34px;
+    font-size: 44px;
   }
   .pf-body {
     grid-template-columns: 1fr;
@@ -1151,9 +1169,22 @@ a {
 }
 
 .post-cover {
+  position: relative;
   background: color-mix(in srgb, var(--c) 9%, var(--paper));
   border-right: 1px solid var(--rule);
   overflow: hidden;
+}
+
+/* 썸네일은 자동 커버 위에 겹쳐 두고, 로드되면 서서히 나타난다 */
+.post-card .post-cover img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease-out, transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.post-card .post-cover img[data-loaded="true"] {
+  opacity: 1;
 }
 
 .post-cover svg,
@@ -1265,7 +1296,7 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .post-cover svg,
-  .post-cover img {
+  .post-card .post-cover img {
     transition: none;
   }
 }

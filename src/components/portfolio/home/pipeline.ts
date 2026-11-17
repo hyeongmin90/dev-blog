@@ -20,7 +20,10 @@ export const NODE_H = 48;
 export const DEFAULT_NODE = "gate";
 
 export const NODES: PipelineNode[] = [
-  { id: "crawler", x: 80, y: 55, label: "수집기", sub: "RSS · 브라우저", title: "사이트별 수집 경로", desc: "RSS가 막힌 기술 블로그는 브라우저로 피드를 읽어 수집합니다." },
+  {
+    id: "crawler", x: 80, y: 55, label: "수집기", sub: "RSS · 브라우저", title: "소스별 주기 수집",
+    desc: "아티클, 기술블로그 등을 수집합니다.",
+  },
   { id: "mq", x: 260, y: 55, label: "RabbitMQ", sub: "Command / Event", title: "Command와 Event 분리", desc: "Outbox·Inbox와 멱등성 키로 메시지 유실과 중복 처리를 막았습니다." },
   { id: "summ", x: 450, y: 55, label: "요약·클러스터링", sub: "LLM", title: "요약과 클러스터링", desc: "같은 사건의 기사를 묶어 대표 기사만 검색 결과에 올립니다." },
   {
@@ -39,7 +42,10 @@ export const NODES: PipelineNode[] = [
     desc: "답변 전에 검색 근거가 충분한지 검증해, 무관한 수치를 인용하는 환각을 줄였습니다.",
     metric: { label: "correctness, 47문항", before: "0.811", after: "0.944" },
   },
-  { id: "answer", x: 610, y: 275, w: 100, label: "답변", sub: "근거 포함", title: "근거 있는 답변", desc: "답변마다 인용한 원문 링크를 함께 돌려줍니다." },
+  {
+    id: "answer", x: 610, y: 275, w: 100, label: "답변", sub: "검증된 인용", title: "읽은 기사만 인용",
+    desc: "검증된 결과를 바탕으로 에이전트가 답변합니다.",
+  },
 ];
 
 export const EDGES: [string, string][] = [

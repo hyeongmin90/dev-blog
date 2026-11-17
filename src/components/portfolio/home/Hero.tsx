@@ -8,7 +8,7 @@ export function Hero() {
         <p className="hero-who">
           <b>{site.name}</b>, {site.role}
         </p>
-        <h1 className="hero-title">
+        <h1 className="hero-title" lang="en">
           {site.portfolio.headline.map((line) => (
             <span key={line} className="hero-line">
               {line}

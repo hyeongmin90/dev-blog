@@ -11,10 +11,10 @@ export const site = {
   repo: "https://github.com/hyeongmin90/dev-blog",
   portfolio: {
     title: "박형민 포트폴리오",
-    description: "AI 기능이 서비스로 돌아가게 만드는 백엔드 엔지니어 박형민의 포트폴리오입니다.",
-    // 히어로 헤드라인. 한 줄씩 나눠 둬야 줄마다 등장 연출이 걸린다.
-    headline: ["AI 기능이 서비스로", "돌아가게 만드는", "백엔드 엔지니어"],
-    lede: "RAG 파이프라인을 검색, 재정렬, 평가까지 확장하고 Spring Boot와 FastAPI 서비스로 운영합니다. 바꾼 것은 수치로 확인합니다.",
+    description: "왜?를 먼저 묻고 답을 만드는 백엔드 엔지니어 박형민의 포트폴리오입니다.",
+    // 히어로 헤드라인(영문). 한 줄씩 나눠 둬야 줄마다 등장 연출이 걸린다.
+    headline: ["Ask why.", "Build the answer."],
+    lede: "스스로 질문하고 고민하며, 더 나은 해결책을 찾습니다.",
   },
   blog: {
     /** 브라우저 탭 제목에 쓰는 블로그 이름 */

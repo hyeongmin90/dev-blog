@@ -10,7 +10,6 @@ const byId = Object.fromEntries(NODES.map((n) => [n.id, n]));
 export function PipelineDiagram() {
   const [selected, setSelected] = useState(DEFAULT_NODE);
   const svgRef = useRef<SVGSVGElement>(null);
-  const node = byId[selected];
 
   // SMIL 애니메이션은 CSS 미디어 쿼리로 멈출 수 없어서, 움직임 줄이기 설정이면 직접 멈춘다.
   useEffect(() => {
@@ -106,16 +105,24 @@ export function PipelineDiagram() {
       </svg>
       </div>
 
-      <div className="sys-panel" aria-live="polite">
-        <h3>{node.title}</h3>
-        <p>{node.desc}</p>
-        {node.metric ? (
-          <p className="sys-metric">
-            {node.metric.label} <span className="delta-before">{node.metric.before}</span> →{" "}
-            <strong className="delta-after">{node.metric.after}</strong>
-          </p>
-        ) : null}
-        <Link href={CASE_STUDY_HREF}>Vantage 케이스 스터디에서 보기</Link>
+      {/* 모든 노드의 설명을 같은 칸에 겹쳐 두고 선택한 것만 보인다.
+          패널 높이가 가장 긴 설명에 맞춰 고정되므로 노드를 바꿔도 아래 화면이 움직이지 않는다. */}
+      <div className="sys-panels" aria-live="polite">
+        {NODES.map((n) => (
+          <div key={n.id} className="sys-panel" data-on={n.id === selected} aria-hidden={n.id !== selected}>
+            <h3>{n.title}</h3>
+            <p>{n.desc}</p>
+            {n.metric ? (
+              <p className="sys-metric">
+                {n.metric.label} <span className="delta-before">{n.metric.before}</span> →{" "}
+                <strong className="delta-after">{n.metric.after}</strong>
+              </p>
+            ) : null}
+            <Link href={CASE_STUDY_HREF} tabIndex={n.id === selected ? undefined : -1}>
+              Vantage 케이스 스터디에서 보기
+            </Link>
+          </div>
+        ))}
       </div>
     </figure>
   );

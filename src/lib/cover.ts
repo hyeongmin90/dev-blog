@@ -40,6 +40,15 @@ export function coverBars(slug: string): CoverBar[] {
   return bars;
 }
 
+/**
+ * 이미지 프록시 URL에 축소 폭(?w=)을 붙인다. 프록시가 그 폭의 WebP로 줄여서 돌려준다.
+ * 외부 이미지 URL은 줄일 수 없으니 그대로 둔다. 폭은 프록시가 허용하는 400/800/1400 중 하나.
+ */
+export function sizedImage(url: string, width: 400 | 800 | 1400): string {
+  if (!url.startsWith("/api/notion-file/")) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}w=${width}`;
+}
+
 // 카테고리 → CSS 색 변수. 모르는 카테고리는 강조색을 쓴다.
 const CATEGORY_COLOR: Record<string, string> = {
   AI: "var(--c-ai)",
