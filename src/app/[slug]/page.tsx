@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { getBlocks } from "@/lib/notion/blocks";
 import { getAllPosts, isBlogPost, worldOf } from "@/lib/notion/posts";
 import { makeCtx } from "@/lib/render-ctx";
+import { site } from "@/lib/site";
 
 // 미리 생성하지 않은 slug도 완성된 결과를 기다렸다가 응답한다.
 // 앱 셸을 먼저 보내면 없는 글이 404 대신 200(소프트 404)으로 나가기 때문이다.
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: PageProps<"/[slug]">): Promis
   if (!found) return {};
   const { post } = found;
   return {
-    title: post.title,
+    // 블로그 글은 "제목 | DevBlog", 포트폴리오 케이스 스터디는 기본 템플릿("제목 | 박형민")
+    title: worldOf(post) === "blog" ? { absolute: `${post.title} | ${site.blog.tabTitle}` } : post.title,
     description: post.summary || undefined,
     openGraph: { title: post.title, description: post.summary || undefined, type: "article" },
   };

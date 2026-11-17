@@ -8,7 +8,7 @@ import { getAllPosts, isBlogPost } from "@/lib/notion/posts";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: site.blog.title,
+  title: { absolute: site.blog.tabTitle },
   description: site.blog.description,
 };
 
