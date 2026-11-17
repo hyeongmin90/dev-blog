@@ -33,7 +33,7 @@ export function Contact() {
       <a href={site.github} target="_blank" rel="noreferrer">
         GitHub
       </a>
-      <Link href="/blog">블로그</Link>
+      <Link href={site.routes.blog}>블로그</Link>
     </div>
   );
 }

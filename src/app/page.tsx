@@ -1,57 +1,68 @@
-import { SiteHeader, PORTFOLIO_SECTIONS } from "@/components/SiteHeader";
-import { Contact } from "@/components/portfolio/home/Contact";
-import { Hero } from "@/components/portfolio/home/Hero";
-import { CareerList, SkillList } from "@/components/portfolio/home/ItemLists";
-import { ProjectList } from "@/components/portfolio/home/ProjectList";
-import { SectionNav } from "@/components/portfolio/home/SectionNav";
-import { getPortfolioItems } from "@/lib/notion/portfolio-items";
-import { getAllPosts, projectsForHome } from "@/lib/notion/posts";
+import type { Metadata } from "next";
+import { BlogList, type ListItem } from "@/components/blog/BlogList";
+import { SiteHeader } from "@/components/SiteHeader";
+import { formatDate } from "@/lib/format";
+import { excerptOf, getBlocks } from "@/lib/notion/blocks";
+import { getBlogCover } from "@/lib/notion/blog-cover";
+import { getAllPosts, isBlogPost } from "@/lib/notion/posts";
 import { site } from "@/lib/site";
-import { currentYear } from "@/lib/year";
 
-// 포트폴리오 홈. 프로젝트는 Developer Log의 order 속성, 나머지는 Portfolio Items DB에서 온다.
-export default async function PortfolioHome() {
-  const [posts, items, year] = await Promise.all([getAllPosts(), getPortfolioItems(), currentYear()]);
-  const projects = projectsForHome(posts);
-  const career = items.filter((i) => i.kind !== "기술");
-  const skills = items.filter((i) => i.kind === "기술");
-  const label = (id: string) => PORTFOLIO_SECTIONS.find((s) => s.id === id)?.label;
+export const metadata: Metadata = {
+  title: { absolute: site.blog.tabTitle },
+  description: site.blog.description,
+};
+
+export default async function BlogPage() {
+  const posts = (await getAllPosts()).filter(isBlogPost);
+  // 본문 블록은 상세 페이지와 같은 캐시를 쓰므로 추가 비용은 처음 한 번뿐이다.
+  const [cover, blocks] = await Promise.all([getBlogCover(), Promise.all(posts.map((p) => getBlocks(p.id)))]);
+
+  const items: ListItem[] = posts.map((p, i) => ({
+    slug: p.slug,
+    title: p.title,
+    excerpt: excerptOf(blocks[i]) || p.summary,
+    date: p.date,
+    category: p.category,
+    tags: p.tags,
+    thumbnail: p.thumbnail,
+  }));
+
+  // 글이 많은 카테고리부터
+  const counts = new Map<string, number>();
+  for (const p of posts) if (p.category) counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
+  const categories = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
 
   return (
     <>
-      <SiteHeader world="portfolio" />
-      <main className="world-portfolio pf-home">
-        <div className="pf-frame">
-          <Hero />
-          <div className="pf-body">
-            <SectionNav sections={PORTFOLIO_SECTIONS} />
-            <div>
-              <section id="work" aria-labelledby="h-work">
-                <h2 id="h-work">{label("work")}</h2>
-                <ProjectList projects={projects} />
-              </section>
-              <section id="career" aria-labelledby="h-career">
-                <h2 id="h-career">{label("career")}</h2>
-                <CareerList items={career} />
-              </section>
-              <section id="skills" aria-labelledby="h-skills">
-                <h2 id="h-skills">{label("skills")}</h2>
-                <SkillList items={skills} />
-              </section>
-              <section id="contact" aria-labelledby="h-contact">
-                <h2 id="h-contact">{label("contact")}</h2>
-                <Contact />
-              </section>
-            </div>
-          </div>
-          <footer className="pf-foot">
-            <span lang="en">
-              © {year} {site.nameEn}
-            </span>
-            <a href={site.repo} target="_blank" rel="noreferrer">
-              블로그 저장소 GitHub
-            </a>
-          </footer>
+      <SiteHeader world="blog" />
+      <main className="world-blog">
+        <div className="blog-wrap">
+          {cover ? (
+            <figure className="blog-banner">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={cover} alt="" />
+            </figure>
+          ) : null}
+          <BlogList
+            items={items}
+            categories={categories}
+            mast={
+              <div>
+                <h1>{site.blog.title}</h1>
+                <p>{site.blog.description}</p>
+                <p className="blog-stat">
+                  <span>
+                    글 <b>{posts.length}</b>편
+                  </span>
+                  {posts[0]?.date ? (
+                    <span>
+                      최근 글 <b>{formatDate(posts[0].date)}</b>
+                    </span>
+                  ) : null}
+                </p>
+              </div>
+            }
+          />
         </div>
       </main>
     </>

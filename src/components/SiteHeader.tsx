@@ -18,8 +18,8 @@ async function paletteItems(): Promise<PaletteItem[]> {
       const { name, tagline } = splitProjectTitle(p.title);
       return { title: tagline ? `${name} ${tagline}` : name, kind: "프로젝트", href: `/${p.slug}` };
     }),
-    ...PORTFOLIO_SECTIONS.map((s) => ({ title: s.label, kind: "포트폴리오", href: `/#${s.id}` })),
-    { title: site.blog.title, kind: "블로그", href: "/blog" },
+    ...PORTFOLIO_SECTIONS.map((s) => ({ title: s.label, kind: "포트폴리오", href: `${site.routes.portfolio}#${s.id}` })),
+    { title: site.blog.title, kind: "블로그", href: site.routes.blog },
     ...posts.filter(isBlogPost).map((p) => ({ title: p.title, kind: "글", href: `/${p.slug}` })),
   ];
 }
@@ -30,14 +30,14 @@ export async function SiteHeader({ world }: { world: World }) {
   return (
     <header className="site-header" data-world={world}>
       <div className="site-header-inner">
-        <Link href="/" className="site-name" lang="en">
+        <Link href={site.routes.blog} className="site-name" lang="en">
           {site.nameEn}
         </Link>
         <nav aria-label="주 메뉴">
-          <Link href="/" aria-current={world === "portfolio" ? "page" : undefined}>
+          <Link href={site.routes.portfolio} aria-current={world === "portfolio" ? "page" : undefined}>
             포트폴리오
           </Link>
-          <Link href="/blog" aria-current={world === "blog" ? "page" : undefined}>
+          <Link href={site.routes.blog} aria-current={world === "blog" ? "page" : undefined}>
             블로그
           </Link>
           <CommandPalette items={items} />

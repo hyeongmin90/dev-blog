@@ -4,6 +4,8 @@ export const site = {
   nameEn: "Park Hyeongmin",
   role: "Backend + AI Engineer",
   url: "https://blog.hyeongmin.dev",
+  // blog.hyeongmin.dev는 블로그가 루트이고, 포트폴리오는 /portfolio에 있다.
+  routes: { blog: "/", portfolio: "/portfolio" },
   // 예전 도메인으로 된 절대 링크를 사이트 내부 링크로 바꿀 때 사용한다.
   hosts: ["blog.hyeongmin.dev", "www.blog.hyeongmin.dev"],
   email: "nsby9000@gmail.com",

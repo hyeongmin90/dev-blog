@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: PageProps<"/[slug]">): Promis
   if (!found) return {};
   const { post } = found;
   return {
-    // 블로그 글은 "제목 | DevBlog", 포트폴리오 케이스 스터디는 기본 템플릿("제목 | 박형민")
-    title: worldOf(post) === "blog" ? { absolute: `${post.title} | ${site.blog.tabTitle}` } : post.title,
+    // 블로그 글은 기본 템플릿("제목 | DevBlog"), 포트폴리오 케이스 스터디는 "제목 | 박형민 포트폴리오"
+    title: worldOf(post) === "portfolio" ? { absolute: `${post.title} | ${site.portfolio.title}` } : post.title,
     description: post.summary || undefined,
     openGraph: { title: post.title, description: post.summary || undefined, type: "article" },
   };

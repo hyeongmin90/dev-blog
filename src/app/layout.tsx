@@ -23,8 +23,9 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: site.portfolio.title, template: `%s | ${site.name}` },
-  description: site.portfolio.description,
+  // 루트(blog.hyeongmin.dev)는 블로그다. 포트폴리오 페이지는 각자 제목을 따로 정한다.
+  title: { default: site.blog.tabTitle, template: `%s | ${site.blog.tabTitle}` },
+  description: site.blog.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

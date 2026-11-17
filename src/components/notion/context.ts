@@ -27,7 +27,7 @@ export function resolveHref(href: string, ctx: RenderCtx): string {
     if (isRelative || /(^|\.)notion\.(so|site|com)$/.test(url.hostname)) {
       const m = url.pathname.replace(/-/g, "").match(NOTION_PAGE_ID);
       const slug = m ? ctx.slugs[normalizeId(m[1])] : undefined;
-      if (slug) return slug === "portfolio" ? "/" : `/${slug}`;
+      if (slug) return `/${slug}`;
     }
   } catch {
     // 잘못된 URL은 그대로 둔다.
@@ -38,7 +38,7 @@ export function resolveHref(href: string, ctx: RenderCtx): string {
 export function pageHref(pageId: string, ctx: RenderCtx): string | null {
   const slug = ctx.slugs[normalizeId(pageId)];
   if (!slug) return null;
-  return slug === "portfolio" ? "/" : `/${slug}`;
+  return `/${slug}`;
 }
 
 export function isExternal(href: string): boolean {

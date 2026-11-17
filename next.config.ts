@@ -13,8 +13,8 @@ const nextConfig: NextConfig = {
     },
   },
   async redirects() {
-    // 예전 사이트의 /portfolio 링크는 이제 홈(포트폴리오)으로 보낸다.
-    return [{ source: "/portfolio", destination: "/", permanent: true }];
+    // 블로그는 루트(/)로 옮겼다. 예전 /blog 링크는 루트로 보낸다.
+    return [{ source: "/blog", destination: "/", permanent: true }];
   },
   turbopack: {
     rules: {
