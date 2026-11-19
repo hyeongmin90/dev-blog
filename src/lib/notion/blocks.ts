@@ -79,6 +79,8 @@ export function collectToc(blocks: NBlock[]): TocItem[] {
   return items;
 }
 
+// 블록 id 전체를 쓴다. 최근 Notion id는 앞자리가 같은 페이지 안에서 겹치기 때문에
+// 앞부분만 잘라 쓰면 제목들이 같은 id를 갖게 된다.
 export function anchorId(blockId: string): string {
-  return `h-${blockId.replace(/-/g, "").slice(0, 12)}`;
+  return `h-${blockId.replace(/-/g, "")}`;
 }
