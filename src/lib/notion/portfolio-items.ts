@@ -2,6 +2,7 @@ import { collectPaginatedAPI, isFullPage } from "@notionhq/client";
 import type { PageObjectResponse } from "@notionhq/client";
 import { cacheLife, cacheTag } from "next/cache";
 import { notion } from "./client";
+import { tags } from "./tags";
 
 export type ItemKind = "활동" | "자격" | "수상" | "기술";
 
@@ -37,7 +38,7 @@ function itemsId(): string {
 export async function getPortfolioItems(): Promise<PortfolioItem[]> {
   "use cache";
   cacheLife("notion");
-  cacheTag("notion");
+  cacheTag(tags.all, tags.items);
 
   const rows = await collectPaginatedAPI(notion().dataSources.query, { data_source_id: itemsId() });
   return rows

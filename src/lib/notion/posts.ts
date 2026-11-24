@@ -3,6 +3,7 @@ import type { PageObjectResponse } from "@notionhq/client";
 import { cacheLife, cacheTag } from "next/cache";
 import { parseMetrics, type Metric } from "@/lib/delta";
 import { dataSourceId, normalizeId, notion } from "./client";
+import { tags } from "./tags";
 
 export type Status = "Public" | "PublicOnDetail";
 export type World = "portfolio" | "blog";
@@ -91,7 +92,7 @@ function toPost(page: PageObjectResponse): Post | null {
 export async function getAllPosts(): Promise<Post[]> {
   "use cache";
   cacheLife("notion");
-  cacheTag("notion");
+  cacheTag(tags.all, tags.posts);
 
   const rows = await collectPaginatedAPI(notion().dataSources.query, {
     data_source_id: dataSourceId(),

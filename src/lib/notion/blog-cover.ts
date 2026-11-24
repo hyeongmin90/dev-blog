@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { dataSourceId, normalizeId, notion } from "./client";
+import { tags } from "./tags";
 
 /**
  * 블로그 목록 상단 커버. Developer Log DB에 걸린 커버 이미지를 쓴다.
@@ -8,7 +9,7 @@ import { dataSourceId, normalizeId, notion } from "./client";
 export async function getBlogCover(): Promise<string | null> {
   "use cache";
   cacheLife("notion");
-  cacheTag("notion");
+  cacheTag(tags.all, tags.cover);
 
   const ds = await notion().dataSources.retrieve({ data_source_id: dataSourceId() });
   if (!("parent" in ds) || ds.parent.type !== "database_id") return null;

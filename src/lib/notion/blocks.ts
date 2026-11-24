@@ -2,6 +2,7 @@ import { collectPaginatedAPI, isFullBlock } from "@notionhq/client";
 import type { BlockObjectResponse } from "@notionhq/client";
 import { cacheLife, cacheTag } from "next/cache";
 import { notion } from "./client";
+import { tags } from "./tags";
 
 export type NBlock = BlockObjectResponse & { children?: NBlock[] };
 
@@ -30,7 +31,7 @@ async function fetchChildren(blockId: string): Promise<NBlock[]> {
 export async function getBlocks(pageId: string): Promise<NBlock[]> {
   "use cache";
   cacheLife("notion");
-  cacheTag("notion");
+  cacheTag(tags.all, tags.page(pageId));
   return fetchChildren(pageId);
 }
 
