@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BlogList, type ListItem } from "@/components/blog/BlogList";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatDate } from "@/lib/format";
-import { excerptOf, getBlocks } from "@/lib/notion/blocks";
+import { getExcerpt } from "@/lib/notion/blocks";
 import { getBlogCover } from "@/lib/notion/blog-cover";
 import { getAllPosts, isBlogPost } from "@/lib/notion/posts";
 import { site } from "@/lib/site";
@@ -14,13 +14,12 @@ export const metadata: Metadata = {
 
 export default async function BlogPage() {
   const posts = (await getAllPosts()).filter(isBlogPost);
-  // 본문 블록은 상세 페이지와 같은 캐시를 쓰므로 추가 비용은 처음 한 번뿐이다.
-  const [cover, blocks] = await Promise.all([getBlogCover(), Promise.all(posts.map((p) => getBlocks(p.id)))]);
+  const [cover, excerpts] = await Promise.all([getBlogCover(), Promise.all(posts.map((p) => getExcerpt(p.id)))]);
 
   const items: ListItem[] = posts.map((p, i) => ({
     slug: p.slug,
     title: p.title,
-    excerpt: excerptOf(blocks[i]) || p.summary,
+    excerpt: excerpts[i] || p.summary,
     date: p.date,
     category: p.category,
     tags: p.tags,

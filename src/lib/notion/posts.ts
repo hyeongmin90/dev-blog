@@ -90,7 +90,7 @@ function toPost(page: PageObjectResponse): Post | null {
 
 /** 공개(Public, PublicOnDetail) 상태인 모든 행. 날짜 내림차순. */
 export async function getAllPosts(): Promise<Post[]> {
-  "use cache";
+  "use cache: remote";
   cacheLife("notion");
   cacheTag(tags.all, tags.posts);
 

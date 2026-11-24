@@ -29,10 +29,22 @@ async function fetchChildren(blockId: string): Promise<NBlock[]> {
 
 /** 페이지 본문 블록 트리 전체. */
 export async function getBlocks(pageId: string): Promise<NBlock[]> {
-  "use cache";
+  "use cache: remote";
   cacheLife("notion");
   cacheTag(tags.all, tags.page(pageId));
   return fetchChildren(pageId);
+}
+
+/**
+ * 목록 카드용 본문 첫머리. 최상위 블록 첫 페이지만 읽어서 글마다 요청 한 번으로 끝낸다.
+ * 홈이 모든 글의 본문 트리를 통째로 받으면 Notion 한도에 걸린다.
+ */
+export async function getExcerpt(pageId: string): Promise<string> {
+  "use cache: remote";
+  cacheLife("notion");
+  cacheTag(tags.all, tags.page(pageId));
+  const res = await notion().blocks.children.list({ block_id: pageId, page_size: 30 });
+  return excerptOf(res.results.filter(isFullBlock));
 }
 
 export function plainText(rich: { plain_text: string }[]): string {

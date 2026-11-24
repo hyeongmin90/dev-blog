@@ -36,7 +36,7 @@ function itemsId(): string {
 
 /** 경력·활동, 자격, 수상, 기술 그룹. order 오름차순. */
 export async function getPortfolioItems(): Promise<PortfolioItem[]> {
-  "use cache";
+  "use cache: remote";
   cacheLife("notion");
   cacheTag(tags.all, tags.items);
 

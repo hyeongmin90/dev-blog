@@ -7,7 +7,7 @@ import { tags } from "./tags";
  * 노션에 업로드한 파일은 URL이 만료되므로 프록시 경로로 바꾸고, 외부 이미지는 그대로 쓴다.
  */
 export async function getBlogCover(): Promise<string | null> {
-  "use cache";
+  "use cache: remote";
   cacheLife("notion");
   cacheTag(tags.all, tags.cover);
 

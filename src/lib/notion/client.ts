@@ -2,6 +2,19 @@ import { Client } from "@notionhq/client";
 
 let client: Client | null = null;
 
+// Notion API 한도는 통합당 평균 초당 3회다. 한 프로세스 안에서 요청 시작 간격을 벌려
+// 홈처럼 여러 글을 한꺼번에 읽는 렌더가 몰려도 한도를 넘지 않게 한다.
+const MIN_GAP_MS = 340;
+let nextSlot = 0;
+
+const throttledFetch: typeof fetch = async (input, init) => {
+  const now = Date.now();
+  const wait = Math.max(0, nextSlot - now);
+  nextSlot = Math.max(now, nextSlot) + MIN_GAP_MS;
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+  return fetch(input, init);
+};
+
 export function notion(): Client {
   const auth = process.env.NOTION_TOKEN;
   if (!auth) {
@@ -10,7 +23,7 @@ export function notion(): Client {
     );
   }
   // SDK가 429와 일시적 오류를 자동으로 재시도한다.
-  client ??= new Client({ auth, retry: { maxRetries: 4 } });
+  client ??= new Client({ auth, retry: { maxRetries: 4 }, fetch: throttledFetch });
   return client;
 }
 

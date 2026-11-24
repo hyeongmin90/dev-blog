@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       expire: 60 * 60 * 24 * 30,
     },
   },
+  experimental: {
+    // 빌드 워커마다 Notion을 따로 부르면 한도(초당 3회)를 금방 넘는다.
+    // 페이지가 수십 개뿐이니 한 워커에 모아서 요청 간격 조절과 메모리 캐시를 같이 쓰게 한다.
+    staticGenerationMinPagesPerWorker: 1000,
+  },
   async redirects() {
     // 블로그는 루트(/)로 옮겼다. 예전 /blog 링크는 루트로 보낸다.
     return [{ source: "/blog", destination: "/", permanent: true }];
