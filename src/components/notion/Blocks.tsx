@@ -108,13 +108,10 @@ function Heading({ level, rich, id, toggle, children, ctx }: { level: 1 | 2 | 3 
   );
 }
 
-const NUMERIC = /^[\s\d.,%+\-−→/x×~()]+$/;
-
 function Table({ block, ctx }: { block: Extract<NBlock, { type: "table" }>; ctx: RenderCtx }) {
   const rows = (block.children ?? []).filter((r): r is Extract<NBlock, { type: "table_row" }> => r.type === "table_row");
   const { has_column_header: colHeader, has_row_header: rowHeader } = block.table;
   const body = colHeader ? rows.slice(1) : rows;
-  const cellClass = (cell: RichTextItemResponse[]) => (NUMERIC.test(plainText(cell)) && plainText(cell).trim() ? "num" : undefined);
   const isBoldRow = (cells: RichTextItemResponse[][]) =>
     cells.every((c) => c.length > 0 && c.every((t) => t.annotations.bold || t.plain_text.trim() === ""));
 
@@ -125,7 +122,7 @@ function Table({ block, ctx }: { block: Extract<NBlock, { type: "table" }>; ctx:
           <thead>
             <tr>
               {rows[0].table_row.cells.map((c, i) => (
-                <th key={i} scope="col" className={i > 0 && body.every((r) => cellClass(r.table_row.cells[i] ?? []) === "num") ? "num" : undefined}>
+                <th key={i} scope="col">
                   <RichText rich={c} ctx={ctx} />
                 </th>
               ))}
@@ -141,7 +138,7 @@ function Table({ block, ctx }: { block: Extract<NBlock, { type: "table" }>; ctx:
                     <RichText rich={c} ctx={ctx} />
                   </th>
                 ) : (
-                  <td key={i} className={cellClass(c)}>
+                  <td key={i}>
                     <RichText rich={c} ctx={ctx} />
                   </td>
                 ),

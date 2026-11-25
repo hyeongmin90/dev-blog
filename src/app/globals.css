@@ -1771,7 +1771,6 @@ ol.n-list {
   }
 }
 
-/* 표: 숫자는 오른쪽 정렬·고정폭 숫자, 굵은 행은 강조 행 */
 .n-table {
   overflow-x: auto;
   margin: 0 0 22px;
@@ -1798,11 +1797,6 @@ ol.n-list {
   color: var(--graphite);
   font-weight: 500;
   border-bottom-color: var(--graphite);
-  white-space: nowrap;
-}
-
-.n-table .num {
-  text-align: right;
   white-space: nowrap;
 }
 
