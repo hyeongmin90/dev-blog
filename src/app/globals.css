@@ -1778,7 +1778,8 @@ ol.n-list {
 
 .n-table table {
   border-collapse: collapse;
-  width: 100%;
+  width: auto;
+  width: calc-size(fit-content, min(100%, size * 1.2));
   font-size: 14px;
   line-height: 1.55;
   font-family: var(--font-voice);
