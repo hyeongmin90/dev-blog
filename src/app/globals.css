@@ -1672,6 +1672,11 @@ ol.n-list {
   overflow-x: auto;
 }
 
+.n-code-wrap pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .n-code pre code {
   background: none;
   padding: 0;

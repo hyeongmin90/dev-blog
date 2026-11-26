@@ -34,8 +34,11 @@ async function highlight(code: string, lang: string): Promise<string> {
 
 export async function Code({ code, language, caption }: { code: string; language: string; caption?: string }) {
   const html = await highlight(code, toLang(language));
+  // 노션 API는 코드 블록의 줄바꿈 설정을 주지 않는다.
+  // 그래서 plain text(로그·설명문)만 줄바꿈하고, 코드 언어는 가로 스크롤로 들여쓰기 구조를 지킨다.
+  const wrap = language === "plain text";
   return (
-    <figure className="n-code">
+    <figure className={wrap ? "n-code n-code-wrap" : "n-code"}>
       <div dangerouslySetInnerHTML={{ __html: html }} />
       {caption ? <figcaption>{caption}</figcaption> : null}
     </figure>
